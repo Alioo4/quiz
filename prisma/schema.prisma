@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id    String @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title String @map("title") @db.VarChar(256)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  subcategory SubCategory[]
+
+  @@id([id])
+  @@map("category")
+}
+
+model SubCategory {
+  id         String @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title      String @map("title") @db.VarChar(256)
+  categoryId String @map("category_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  quiz Quiz[]
+
+  category Category @relation(fields: [categoryId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@id([id])
+  @@map("sub_category")
+}
+
+model Quiz {
+  id            String  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  text          String  @map("text") @db.Text
+  description   String?
+  language      Language @default(UZ)
+  subCategoryId String  @map("sub_category_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  option Option[]
+
+  subCategory SubCategory @relation(fields: [subCategoryId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+
+  @@id([id])
+  @@map("quiz")
+}
+
+model Option {
+  id        String  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  text      String
+  isCorrect Boolean
+  quizId    String  @map("quiz_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  quiz Quiz @relation(fields: [quizId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+
+  @@id([id])
+  @@map("option")
+}
+
+enum Language {
+  UZ
+  RU
+  EN
+}
