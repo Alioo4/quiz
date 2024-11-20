@@ -12,9 +12,44 @@ export class CategoryService {
     return data.id;
   }
 
-  async findAll() {
-    return this.prisma.category.findMany(); 
+  async findAll(query: { page?: number; pageSize?: number; title?: string }) {
+    const { page = 1, pageSize = 10, title } = query;
+  
+    const pageNumber = Number(page) || 1;
+    const size = Number(pageSize) || 10;
+    const skip = (pageNumber - 1) * size;
+  
+    const filters: any = {};
+    if (title) {
+      filters.title = {
+        contains: title,
+        mode: 'insensitive',
+      };
+    }
+  
+    const [categories, totalCount] = await Promise.all([
+      this.prisma.category.findMany({
+        where: filters, 
+        skip,
+        take: size,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.category.count({
+        where: filters, 
+      }),
+    ]);
+  
+    return {
+      data: categories,
+      meta: {
+        total: totalCount,
+        page: pageNumber,
+        pageSize: size,
+        totalPages: Math.ceil(totalCount / size),
+      },
+    };
   }
+  
 
   async findOne(id: string) {
     return this.prisma.category.findUniqueOrThrow({ where: { id } }); // Directly return the result

@@ -14,8 +14,49 @@ export class OptionService {
     return data.id;
   }
 
-  async findAll() {
-    return await this.prisma.option.findMany();
+  async findAll(query: { page?: number; pageSize?: number; text?: string; quizId?: string; isCorrect?: boolean }) {
+    const { page = 1, pageSize = 10, text, quizId, isCorrect } = query;
+
+    const pageNumber = Number(page) || 1;
+    const size = Number(pageSize) || 10;
+    const skip = (pageNumber - 1) * size;
+
+    const filters: any = {};
+    if (text) {
+      filters.text = {
+        contains: text,
+        mode: 'insensitive', 
+      };
+    }
+    if (quizId) {
+      filters.quizId = quizId;
+    }
+    if (typeof isCorrect === 'boolean') {
+      filters.isCorrect = isCorrect;
+    }
+
+    const [options, totalCount] = await Promise.all([
+      this.prisma.option.findMany({
+        where: filters,
+        skip,
+        take: size,
+        orderBy: { createdAt: 'desc' },
+        include: { quiz: true }, 
+      }),
+      this.prisma.option.count({
+        where: filters,
+      }),
+    ]);
+
+    return {
+      data: options,
+      meta: {
+        total: totalCount,
+        page: pageNumber,
+        pageSize: size,
+        totalPages: Math.ceil(totalCount / size),
+      },
+    };
   }
 
   async findOne(id: string) {

@@ -14,8 +14,46 @@ export class QuizService {
     return data.id;
   }
 
-  async findAll() {
-    return await this.prisma.quiz.findMany();
+  async findAll(query: { page?: number; pageSize?: number; text?: string; subCategoryId?: string }) {
+    const { page = 1, pageSize = 10, text, subCategoryId } = query;
+
+    const pageNumber = Number(page) || 1;
+    const size = Number(pageSize) || 10;
+    const skip = (pageNumber - 1) * size;
+
+    const filters: any = {};
+    if (text) {
+      filters.text = {
+        contains: text,
+        mode: 'insensitive', 
+      };
+    }
+    if (subCategoryId) {
+      filters.subCategoryId = subCategoryId; 
+    }
+
+    const [quizzes, totalCount] = await Promise.all([
+      this.prisma.quiz.findMany({
+        where: filters,
+        skip,
+        take: size,
+        orderBy: { createdAt: 'desc' },
+        include: { subCategory: true },
+      }),
+      this.prisma.quiz.count({
+        where: filters,
+      }),
+    ]);
+
+    return {
+      data: quizzes,
+      meta: {
+        total: totalCount,
+        page: pageNumber,
+        pageSize: size,
+        totalPages: Math.ceil(totalCount / size),
+      },
+    };
   }
 
   async findOne(id: string) {

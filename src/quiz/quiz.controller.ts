@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { QuizService } from './quiz.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
+import { ApiQuery } from '@nestjs/swagger';
 
 @Controller('quiz')
 export class QuizController {
@@ -13,8 +14,17 @@ export class QuizController {
   }
 
   @Get()
-  findAll() {
-    return this.quizService.findAll();
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number, description: 'Number of items per page (default: 10)' })
+  @ApiQuery({ name: 'text', required: false, type: String, description: 'Filter by text content (partial match)' })
+  @ApiQuery({ name: 'subCategoryId', required: false, type: String, description: 'Filter by SubCategory ID' })
+  findAll(
+    @Query('page') page?: number,
+    @Query('pageSize') pageSize?: number,
+    @Query('text') text?: string,
+    @Query('subCategoryId') subCategoryId?: string,
+  ) {
+    return this.quizService.findAll({ page, pageSize, text, subCategoryId });
   }
 
   @Get(':id')

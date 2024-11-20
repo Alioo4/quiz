@@ -14,8 +14,46 @@ export class SubCategoryService {
     return data.id;
   }
 
-  async findAll() {
-    return await this.prisma.subCategory.findMany();
+  async findAll(query: { page?: number; pageSize?: number; title?: string; categoryId?: string }) {
+    const { page = 1, pageSize = 10, title, categoryId } = query;
+
+    const pageNumber = Number(page) || 1;
+    const size = Number(pageSize) || 10;
+    const skip = (pageNumber - 1) * size;
+
+    const filters: any = {};
+    if (title) {
+      filters.title = {
+        contains: title,
+        mode: 'insensitive',
+      };
+    }
+    if (categoryId) {
+      filters.categoryId = categoryId;
+    }
+
+    const [subCategories, totalCount] = await Promise.all([
+      this.prisma.subCategory.findMany({
+        where: filters,
+        skip,
+        take: size,
+        orderBy: { createdAt: 'desc' },
+        include: { category: true }, 
+      }),
+      this.prisma.subCategory.count({
+        where: filters,
+      }),
+    ]);
+
+    return {
+      data: subCategories,
+      meta: {
+        total: totalCount,
+        page: pageNumber,
+        pageSize: size,
+        totalPages: Math.ceil(totalCount / size),
+      },
+    };
   }
 
   async findOne(id: string) {
