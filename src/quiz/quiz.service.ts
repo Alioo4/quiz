@@ -56,6 +56,59 @@ export class QuizService {
     };
   }
 
+  async getQuizzes(query: any) {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      subCategoryId,
+      isShuffle = 'false',
+    } = query;
+
+    const pageNumber = Math.max(1, parseInt(page, 10));
+    const pageSize = Math.max(1, parseInt(limit, 10));
+    const skip = (pageNumber - 1) * pageSize;
+
+    const whereCondition: any = {
+      ...(search && {
+        OR: [
+          { text: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ],
+      }),
+      ...(subCategoryId && { subCategoryId }),
+    };
+
+    let quizzes;
+    const total = await this.prisma.quiz.count({ where: whereCondition });
+
+    if (isShuffle === 'true') {
+      const allQuizzes = await this.prisma.quiz.findMany({
+        where: whereCondition,
+        include: { option: true },
+      });
+      quizzes = allQuizzes.sort(() => Math.random() - 0.5).slice(skip, skip + pageSize);
+    } else {
+      quizzes = await this.prisma.quiz.findMany({
+        where: whereCondition,
+        skip,
+        take: pageSize,
+        orderBy: { createdAt: 'desc' },
+        include: { option: true },
+      });
+    }
+
+    return {
+      data: quizzes,
+      pagination: {
+        page: pageNumber,
+        limit: pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    };
+  }
+
   async findOne(id: string) {
     const data = await this.prisma.quiz.findUniqueOrThrow({where: {id}})
     return data;

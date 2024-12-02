@@ -2,7 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { QuizService } from './quiz.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
-import { ApiQuery } from '@nestjs/swagger';
+import { ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { GetQuizzesDto } from './dto/query-quiz.dto';
 
 @Controller('quiz')
 export class QuizController {
@@ -25,6 +26,22 @@ export class QuizController {
     @Query('subCategoryId') subCategoryId?: string,
   ) {
     return this.quizService.findAll({ page, pageSize, text, subCategoryId });
+  }
+
+  @Get('Get-With-Opitions')
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'search', required: false, type: String, example: 'example quiz' })
+  @ApiQuery({ name: 'subCategoryId', required: false, type: String, example: 'uuid' })
+  @ApiQuery({ name: 'isShuffle', required: false, type: Boolean, example: false })
+  @ApiResponse({ status: 200, description: 'List of quizzes' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
+  async getQuizzes(@Query() query: GetQuizzesDto) {
+    const result = await this.quizService.getQuizzes(query);
+    return {
+      message: 'Quizzes fetched successfully',
+      ...result,
+    };
   }
 
   @Get(':id')
