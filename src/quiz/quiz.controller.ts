@@ -39,7 +39,6 @@ export class QuizController {
   async getQuizzes(@Query() query: GetQuizzesDto) {
     const result = await this.quizService.getQuizzes(query);
     return {
-      message: 'Quizzes fetched successfully',
       ...result,
     };
   }
