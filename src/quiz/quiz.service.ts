@@ -100,7 +100,7 @@ export class QuizService {
 
     return {
       data: quizzes,
-      pagination: {
+      meta: {
         total,
         page: pageNumber,
         pageSize: pageSize,
