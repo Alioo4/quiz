@@ -103,7 +103,7 @@ export class QuizService {
       pagination: {
         total,
         page: pageNumber,
-        limit: pageSize,
+        pageSize: pageSize,
         totalPages: Math.ceil(total / pageSize),
       },
     };
