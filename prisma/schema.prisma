@@ -38,9 +38,10 @@ model SubCategory {
 
 model Quiz {
   id            String  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  text          String  @map("text") @db.Text
+  text          String?  @map("text") @db.Text
   description   String?
   language      Language @default(UZ)
+  image         String? 
   subCategoryId String  @map("sub_category_id") @db.Uuid
 
   createdAt DateTime @default(now()) @map("created_at")
