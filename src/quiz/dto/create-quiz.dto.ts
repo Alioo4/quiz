@@ -22,6 +22,11 @@ export class CreateQuizDto {
   @IsEnum(Language, { message: "Language must be one of: UZ, RU, EN" })
   language: Language;
 
+  @ApiProperty({example: "669e0531-ac25-4727-9708-81e5912966c9.jpg"})
+  @IsString()
+  @IsOptional()
+  image: string;
+
   @ApiProperty({example: "uuid"})
   @IsUUID()
   @IsNotEmpty()

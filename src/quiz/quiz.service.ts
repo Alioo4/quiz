@@ -10,7 +10,7 @@ export class QuizService {
   ){}
 
   async create(payload: CreateQuizDto) {
-    const data = await this.prisma.quiz.create({data: {text: payload.text, description: payload.description, language: payload.language, subCategoryId: payload.subCategoryId}})
+    const data = await this.prisma.quiz.create({data: {text: payload.text, description: payload.description, language: payload.language, subCategoryId: payload.subCategoryId, image: payload.image}})
     return data.id;
   }
 

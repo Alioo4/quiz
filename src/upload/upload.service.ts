@@ -11,18 +11,18 @@ export class UploadsService {
     this.uploadPath = join(process.cwd(), 'uploads');
   }
 
-  async create(file: {
+  async create(image: {
     fileName: string;
     fileType: string;
     body: Buffer;
   }): Promise<{ name: string }> {
-    const name = `${randomUUID()}${extname(file.fileName)}`;
+    const name = `${randomUUID()}${extname(image.fileName)}`;
     const filePath = join(this.uploadPath, name);
 
     try {
       await mkdir(this.uploadPath, { recursive: true });
 
-      await writeFile(filePath, file.body);
+      await writeFile(filePath, image.body);
 
       return { name };
     } catch (error) {
