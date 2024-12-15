@@ -21,7 +21,7 @@ export class UploadsController {
     schema: {
       type: 'object',
       properties: {
-        image: {
+        file: {
           type: 'string',
           format: 'binary',
         },
