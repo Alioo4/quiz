@@ -7,6 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User{
+  id        String  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username  String  @unique
+  password  String
+  email     String  @unique
+  role      Role    @default(USER)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([id])
+  @@map("user")
+}
+
 model Category {
   id    String @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title String @map("title") @db.VarChar(256)
@@ -74,4 +87,10 @@ enum Language {
   UZ
   RU
   EN
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
 }

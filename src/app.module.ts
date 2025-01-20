@@ -5,6 +5,7 @@ import { SubCategoryModule } from './sub-category/sub-category.module';
 import { QuizModule } from './quiz/quiz.module';
 import { OptionModule } from './option/option.module';
 import { UploadsModule } from './upload/upload.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UploadsModule } from './upload/upload.module';
     QuizModule,
     OptionModule,
     UploadsModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
