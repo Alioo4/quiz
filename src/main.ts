@@ -6,23 +6,25 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {cors: true});
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.setGlobalPrefix('api');
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.enableCors();
   app.enableVersioning();
 
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('Quiz Platform example')
+    .setDescription('The quiz platform API description')
     .setVersion('1.0')
-    .addTag('cats')
+    .addTag('quiz')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, documentFactory);
 
-  await app.listen(5000, () => {
-    console.log(`Server: http://localhost:5000`);
-    console.log(`Docs:   http://localhost:5000/api/docs`);
+  const appPort: number = +process.env.APP_PORT
+
+  await app.listen(appPort, () => {
+    console.log(`Server: http://localhost:${appPort}`);
+    console.log(`Docs:   http://localhost:${appPort}/api/docs`);
   });
 }
 bootstrap();
