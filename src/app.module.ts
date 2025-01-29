@@ -6,6 +6,8 @@ import { QuizModule } from './modules/quiz/quiz.module';
 import { OptionModule } from './modules/option/option.module';
 import { UploadsModule } from './modules/upload/upload.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { PermissionModule } from './modules/permission/permission.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { AuthModule } from './modules/auth/auth.module';
     OptionModule,
     UploadsModule,
     AuthModule,
+    PermissionModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
