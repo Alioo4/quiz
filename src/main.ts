@@ -1,10 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {cors: true});
+  const logger = new Logger(AppModule.name);
 
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
@@ -23,8 +24,8 @@ async function bootstrap() {
   const appPort: number = +process.env.APP_PORT
 
   await app.listen(appPort, () => {
-    console.log(`Server: http://localhost:${appPort}`);
-    console.log(`Docs:   http://localhost:${appPort}/api/docs`);
+    logger.log(`Server: http://localhost:${appPort}`);
+    logger.log(`Docs:   http://localhost:${appPort}/api/docs`);
   });
 }
 bootstrap();

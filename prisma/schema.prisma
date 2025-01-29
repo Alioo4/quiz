@@ -7,17 +7,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{
-  id        String  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username  String  @unique
+model User {
+  id        String   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username  String   @unique
   password  String
-  email     String  @unique
-  role      Role    @default(USER)
+  email     String   @unique
+  role      Role     @default(USER)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  permission Permission[]
+
   @@id([id])
   @@map("user")
+}
+
+model Permission {
+  id         String   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @map("user_id")
+  categoryId String   @map("category_id")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  category Category @relation(fields: [categoryId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@id([id])
+  @@map("permission")
 }
 
 model Category {
@@ -28,6 +44,7 @@ model Category {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   subcategory SubCategory[]
+  permission  Permission[]
 
   @@id([id])
   @@map("category")
@@ -50,12 +67,12 @@ model SubCategory {
 }
 
 model Quiz {
-  id            String  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id            String   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   text          String?  @map("text") @db.Text
   description   String?
   language      Language @default(UZ)
-  image         String? 
-  subCategoryId String  @map("sub_category_id") @db.Uuid
+  image         String?
+  subCategoryId String   @map("sub_category_id") @db.Uuid
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
